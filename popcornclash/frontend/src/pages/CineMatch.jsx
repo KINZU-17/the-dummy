@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGame } from '../context/GameStateContext';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -9,7 +9,6 @@ import StatsView from '../components/StatsView';
 import LiveCompanion from '../components/LiveCompanion';
 import CineJamLobby from '../components/CineJamLobby';
 import MoviePlayer from '../components/MoviePlayer';
-import Footer from '../components/Footer';
 import HomeFeed from './HomeFeed';
 import Leaderboard from './Leaderboard';
 import Analytics from './Analytics';
@@ -21,7 +20,6 @@ import { INITIAL_MOVIES, INITIAL_COLLECTIONS, INITIAL_WATCHING_HISTORY } from '.
 export default function CineMatch() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id: matchIdFromRoute } = useParams();
   const { user, logout } = useGame();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,10 +28,10 @@ export default function CineMatch() {
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState(null);
 
-  const activeTab = typeof location.state?.activeTab === 'string' ? location.state.activeTab : (() => {
+  const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem('popcornclash_tab');
     return saved || 'discover';
-  })();
+  });
 
   const getActivePage = () => {
     if (location.pathname.startsWith('/match/')) return 'match';
@@ -46,7 +44,7 @@ export default function CineMatch() {
   };
 
   const activePage = getActivePage();
-  const activeMatchId = matchIdFromRoute || null;
+  const activeMatchId = location.pathname.startsWith('/match/') ? location.pathname.split('/match/')[1] : null;
 
   const handleLogout = () => { logout(); navigate('/login'); };
   const onSearchFocus = () => {};
@@ -186,7 +184,6 @@ export default function CineMatch() {
         <main className="flex-1 pt-28 px-4 md:px-10 pb-20 max-w-[1440px] w-full mx-auto">
           {renderContent()}
         </main>
-        <Footer />
       </div>
 
       {showCineJam && <CineJamLobby onClose={() => setShowCineJam(false)} onAddMovieToLibrary={handleAddOrUpdateMovie} />}

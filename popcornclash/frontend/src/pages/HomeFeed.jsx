@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchLiveMatches, fetchUpcomingMatches } from '../utils/streamingApi';
-
-const FOOTBALL_KEY = import.meta.env.VITE_FOOTBALL_API_KEY;
+import { api } from '../utils/backendApi';
 
 export default function HomeFeed({ searchQuery = '', onMatchClick }) {
   const [selectedTab, setSelectedTab] = useState('ALL');
@@ -12,9 +10,16 @@ export default function HomeFeed({ searchQuery = '', onMatchClick }) {
     async function loadFixtures() {
       setLoading(true);
       try {
-        const live = await fetchLiveMatches();
-        const upcoming = await fetchUpcomingMatches();
-        setFixtures([...live, ...upcoming]);
+        const data = await api.fixtures.list();
+        const mapped = (data.fixtures || []).map((f) => ({
+          id: f.id,
+          league: f.home_league || f.away_league || 'Unknown',
+          status: f.status,
+          matchDate: f.match_date,
+          homeTeam: { name: f.home_name, code: f.home_code, score: 0 },
+          awayTeam: { name: f.away_name, code: f.away_code, score: 0 },
+        }));
+        setFixtures(mapped);
       } catch (err) {
         console.error('Failed to load matches:', err);
       } finally {
@@ -76,44 +81,43 @@ export default function HomeFeed({ searchQuery = '', onMatchClick }) {
         ) : filteredFixtures.length === 0 ? (
           <div className="col-span-2 rounded-3xl border border-gray-800/80 bg-pitch-card p-8 text-center">
             <p className="text-xs text-white/40 uppercase tracking-[0.2em]">No matches available</p>
-            <p className="text-[8px] text-white/20 mt-2">Using key: {FOOTBALL_KEY ? 'yes' : 'missing'}</p>
           </div>
         ) : null}
         {!loading && filteredFixtures.map((match) => (
           <button
-             key={match.id}
-             type="button"
-             onClick={() => onMatchClick && onMatchClick(match.id)}
-             className="flex flex-col justify-between rounded-3xl border border-gray-800/70 bg-pitch-card p-5 text-left shadow-card-glow transition-all duration-200 hover:-translate-y-1 hover:border-gray-700"
-           >
-              <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.25em] text-gray-400">
-                <span>{match.league}</span>
-                <span className={match.status === 'LIVE' ? 'text-emerald-400' : 'text-popcorn-gold'}>{match.status === 'LIVE' ? `${match.matchDate}` : match.matchDate}</span>
+            key={match.id}
+            type="button"
+            onClick={() => onMatchClick && onMatchClick(match.id)}
+            className="flex flex-col justify-between rounded-3xl border border-gray-800/70 bg-pitch-card p-5 text-left shadow-card-glow transition-all duration-200 hover:-translate-y-1 hover:border-gray-700"
+          >
+            <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.25em] text-gray-400">
+              <span>{match.league}</span>
+              <span className={match.status === 'LIVE' ? 'text-emerald-400' : 'text-popcorn-gold'}>{match.status === 'LIVE' ? `${match.matchDate}` : match.matchDate}</span>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <div className="inline-flex rounded-full bg-pitch-over px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-clash-cyan">
+                  {match.homeTeam.code}
+                </div>
+                <div className="mt-3 text-lg font-black text-white">{match.homeTeam.name}</div>
+                {match.status === 'LIVE' && (
+                  <div className="text-sm text-popcorn-gold font-mono">Score: {match.homeTeam.score} - {match.awayTeam.score}</div>
+                )}
               </div>
 
-             <div className="mt-5 flex items-center justify-between gap-3">
-               <div className="flex-1">
-                 <div className="inline-flex rounded-full bg-pitch-over px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-clash-cyan">
-                   {match.homeTeam.code}
-                 </div>
-                 <div className="mt-3 text-lg font-black text-white">{match.homeTeam.name}</div>
-                 {match.status === 'LIVE' && (
-                   <div className="text-sm text-popcorn-gold font-mono">Score: {match.homeTeam.score} - {match.awayTeam.score}</div>
-                 )}
-               </div>
+              <div className="rounded-full border border-gray-800 bg-pitch-over px-3 py-2 text-sm font-black text-popcorn-gold">VS</div>
 
-               <div className="rounded-full border border-gray-800 bg-pitch-over px-3 py-2 text-sm font-black text-popcorn-gold">VS</div>
-
-               <div className="flex-1 text-right">
-                 <div className="inline-flex rounded-full bg-pitch-over px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-clash-cyan">
-                   {match.awayTeam.code}
-                 </div>
-                 <div className="mt-3 text-lg font-black text-white">{match.awayTeam.name}</div>
-               </div>
-             </div>
-           </button>
-         ))}
-       </div>
+              <div className="flex-1 text-right">
+                <div className="inline-flex rounded-full bg-pitch-over px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-clash-cyan">
+                  {match.awayTeam.code}
+                </div>
+                <div className="mt-3 text-lg font-black text-white">{match.awayTeam.name}</div>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

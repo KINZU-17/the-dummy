@@ -1,25 +1,25 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useGame } from '../context/GameStateContext';
+import { api } from '../utils/backendApi';
 
 export default function Signup() {
   const [form, setForm] = useState({ username: '', email: '', password: '', favorite_club: '' });
-  const { setUser } = useGame();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    setUser({
-      isAuthenticated: true,
-      username: form.username,
-      role: 'member',
-      streak_count: 1,
-      current_level: 1,
-      current_xp: 60,
-      xp_to_next_level: 240,
-      favorite_club: form.favorite_club
-    });
-    navigate('/');
+    setError('');
+    setLoading(true);
+    try {
+      await api.auth.register(form);
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Signup failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,6 +28,7 @@ export default function Signup() {
         <h2 className="text-2xl font-black text-white uppercase tracking-wider">Create Account</h2>
         <p className="text-xs text-gray-500 mt-1">Set up your PopcornClash profile.</p>
       </div>
+      {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs">{error}</div>}
       <form onSubmit={handleSignup} className="space-y-4">
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Username</label>
@@ -50,8 +51,8 @@ export default function Signup() {
             <option value="Liverpool FC">Liverpool FC</option>
           </select>
         </div>
-        <button type="submit" className="w-full py-3 bg-linear-to-r from-popcorn-gold to-popcorn-glow text-pitch-dark font-black rounded-lg text-sm uppercase tracking-wider mt-4">
-          Create Account
+        <button type="submit" disabled={loading} className="w-full py-3 bg-linear-to-r from-popcorn-gold to-popcorn-glow text-pitch-dark font-black rounded-lg text-sm uppercase tracking-wider mt-4 disabled:opacity-50">
+          {loading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
       <p className="text-center text-xs text-gray-400 mt-4">

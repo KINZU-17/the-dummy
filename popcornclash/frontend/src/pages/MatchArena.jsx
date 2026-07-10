@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const API_BASE = import.meta.env.VITE_BACKEND_URL || '';
+import { api } from '../utils/backendApi';
 
 export default function MatchArena({ matchId }) {
   const [vote, setVote] = useState({ selection: null, ratio: 50 });
@@ -13,14 +12,18 @@ export default function MatchArena({ matchId }) {
     async function loadData() {
       if (!matchId) return;
       try {
-        if (API_BASE) {
-          const res = await fetch(`${API_BASE}/api/fixtures/${matchId}`);
-          if (res.ok) {
-            const matchData = await res.json();
-            setMatch(matchData);
-            if (matchData.globalVotes) setGlobalVotes(matchData.globalVotes);
-          }
-        }
+        const fixtureData = await api.fixtures.get(matchId);
+        setMatch(fixtureData.fixture);
+
+        const predictionsData = await api.predictions.listForFixture(matchId);
+        const predictions = predictionsData.predictions || [];
+        const votes = { home: 0, draw: 0, away: 0 };
+        predictions.forEach((p) => {
+          if (p.predicted_winner_id === fixtureData.fixture.team_home_id) votes.home += 1;
+          else if (p.predicted_winner_id === fixtureData.fixture.team_away_id) votes.away += 1;
+          else votes.draw += 1;
+        });
+        setGlobalVotes(votes);
       } catch (err) {
         console.error('Failed to load match data:', err);
       }
@@ -32,23 +35,18 @@ export default function MatchArena({ matchId }) {
     if (!vote.selection || submitted) return;
     setSubmitting(true);
     try {
-      if (API_BASE) {
-        const res = await fetch(`${API_BASE}/api/predictions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-          },
-          body: JSON.stringify({
-            fixture_id: matchId,
-            prediction: vote.selection,
-            confidence: vote.ratio
-          })
-        });
-        if (res.ok) setSubmitted(true);
-      } else {
-        setSubmitted(true);
-      }
+      const predicted_winner_id = vote.selection === 'HOME'
+        ? match.team_home_id
+        : vote.selection === 'AWAY'
+          ? match.team_away_id
+          : 0;
+
+      await api.predictions.create({
+        fixture_id: matchId,
+        predicted_winner_id,
+        confidence: vote.ratio,
+      });
+      setSubmitted(true);
     } catch (err) {
       console.error('Prediction error:', err);
     } finally {
@@ -56,7 +54,7 @@ export default function MatchArena({ matchId }) {
     }
   };
 
-  const matchTitle = match ? `${match.homeTeam?.name || 'Home'} vs ${match.awayTeam?.name || 'Away'}` : 'Select Match';
+  const matchTitle = match ? `${match.home_name || 'Home'} vs ${match.away_name || 'Away'}` : 'Select Match';
 
   const totalVotes = globalVotes.home + globalVotes.draw + globalVotes.away;
   const homePercent = totalVotes ? Math.round((globalVotes.home / totalVotes) * 100) : 0;

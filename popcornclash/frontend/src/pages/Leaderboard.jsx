@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameStateContext';
 import { TrendingUp, TrendingDown, Minus, Star, Target } from 'lucide-react';
-import { INITIAL_TEAMS, INITIAL_FRIENDS, INITIAL_PREDICTORS } from '../data';
+import { INITIAL_TEAMS, INITIAL_FRIENDS } from '../data';
+import { api } from '../utils/backendApi';
 
 const TABS = [
   { id: 'clubs', label: 'Club Rankings' },
@@ -10,10 +11,7 @@ const TABS = [
 ];
 
 const teams = INITIAL_TEAMS;
-
 const friends = INITIAL_FRIENDS;
-
-const predictors = INITIAL_PREDICTORS;
 
 function TrendIcon({ trend }) {
   if (trend === 'up') return <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />;
@@ -29,6 +27,28 @@ function RankBadge({ rank }) {
 export default function Leaderboard() {
   const { user } = useGame();
   const [activeTab, setActiveTab] = useState('clubs');
+  const [predictors, setPredictors] = useState([]);
+
+  useEffect(() => {
+    async function loadLeaderboard() {
+      try {
+        const data = await api.teams.leaderboard();
+        const mapped = (data.leaderboard || []).map((entry, index) => ({
+          rank: index + 1,
+          username: entry.username,
+          streak: entry.prediction_streak || 0,
+          correct: entry.correct_predictions || 0,
+          total: entry.total_predictions || 0,
+          accuracy: entry.total_predictions ? Math.round((entry.correct_predictions / entry.total_predictions) * 100) : 0,
+          xp: entry.total_xp || 0,
+        }));
+        setPredictors(mapped);
+      } catch (err) {
+        console.error('Failed to load leaderboard:', err);
+      }
+    }
+    loadLeaderboard();
+  }, []);
 
   const friendsWithUser = friends.map((f) =>
     f.isYou ? { ...f, username: user.username || 'You', streak: user.streak_count || 0, xp: user.current_xp || 0, favorite_club: user.favorite_club || '' } : f

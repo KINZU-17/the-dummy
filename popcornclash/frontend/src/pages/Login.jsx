@@ -1,26 +1,39 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameStateContext';
+import { api } from '../utils/backendApi';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { setUser } = useGame();
   const navigate = useNavigate();
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setUser({
-      isAuthenticated: true,
-      username: email.split('@')[0],
-      role: 'member',
-      streak_count: 1,
-      current_level: 2,
-      current_xp: 175,
-      xp_to_next_level: 325,
-      favorite_club: 'Arsenal FC'
-    });
-    navigate('/');
+    setError('');
+    setLoading(true);
+    try {
+      const data = await api.auth.login({ email, password });
+      localStorage.setItem('token', data.token);
+      setUser({
+        isAuthenticated: true,
+        username: data.user.username,
+        role: data.user.role,
+        streak_count: data.user.prediction_streak,
+        current_level: data.user.current_level,
+        current_xp: data.user.total_xp,
+        xp_to_next_level: 100,
+        favorite_club: data.user.favorite_club,
+      });
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,6 +41,7 @@ export default function Login() {
       <div className="text-center mb-6">
         <h2 className="text-2xl font-black text-white uppercase tracking-wider mt-2">Sign In</h2>
       </div>
+      {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs">{error}</div>}
       <form onSubmit={handleLoginSubmit} className="space-y-5">
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
@@ -40,8 +54,8 @@ export default function Login() {
         <div className="text-right">
           <Link to="/forgot-password" className="text-xs text-popcorn-gold hover:underline">Forgot Password?</Link>
         </div>
-        <button type="submit" className="w-full py-3 bg-linear-to-r from-popcorn-gold to-popcorn-glow text-pitch-dark font-black rounded-lg text-sm uppercase tracking-wider shadow-md hover:opacity-90 active:scale-[0.99] transition-all">
-          Sign In
+        <button type="submit" disabled={loading} className="w-full py-3 bg-linear-to-r from-popcorn-gold to-popcorn-glow text-pitch-dark font-black rounded-lg text-sm uppercase tracking-wider shadow-md hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-50">
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
       <p className="text-center text-xs text-gray-400 mt-6">

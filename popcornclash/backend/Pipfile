@@ -5,8 +5,10 @@ name = "pypi"
 
 [packages]
 structlog = "*"
-flask-cors = "*"
 flask = "*"
+flask-cors = "*"
+python-dotenv = "*"
+requests = "*"
 
 [dev-packages]
 
