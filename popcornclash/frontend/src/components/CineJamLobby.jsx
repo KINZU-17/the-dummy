@@ -95,7 +95,7 @@ export default function CineJamLobby({ onClose, onAddMovieToLibrary }) {
             <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">
               {step === 1 ? 'PopcornJam Lobby' : step === 2 ? 'Vibe & Genre' : 'Your Match!'}
             </h2>
-            <p className="text-[9px] text-on-surface-variant uppercase tracking-[0.1em] mt-1 font-mono">Step {step} of 3</p>
+            <p className="text-[9px] text-on-surface-variant uppercase tracking-widest mt-1 font-mono">Step {step} of 3</p>
           </div>
           <button onClick={onClose} className="p-2 text-white hover:text-white transition-colors cursor-pointer">
             <X className="w-5 h-5" />
@@ -212,7 +212,7 @@ export default function CineJamLobby({ onClose, onAddMovieToLibrary }) {
                           : 'bg-surface-container-low border-surface-container-high text-white hover:border-white/20'
                       }`}
                     >
-                      <p className="text-[9px] font-bold uppercase tracking-[0.1em]">{mood.name}</p>
+                      <p className="text-[9px] font-bold uppercase tracking-widest">{mood.name}</p>
                     </button>
                   ))}
                 </div>
@@ -233,7 +233,7 @@ export default function CineJamLobby({ onClose, onAddMovieToLibrary }) {
                           : 'bg-surface-container-low border-surface-container-high text-white/60 hover:border-white/20 hover:text-white'
                       }`}
                     >
-                      <p className="text-[8px] font-bold uppercase tracking-[0.05em]">{genre}</p>
+                      <p className="text-[8px] font-bold uppercase tracking-wider">{genre}</p>
                     </button>
                   ))}
                 </div>
@@ -270,7 +270,7 @@ export default function CineJamLobby({ onClose, onAddMovieToLibrary }) {
               {countdown !== null && countdown > 0 && (
                 <div className="flex items-center justify-center gap-2 p-3 bg-surface-container-low border border-surface-container-high">
                   <Clock className="w-3.5 h-3.5 text-on-surface-variant" />
-                  <span className="text-[10px] text-white/60 uppercase tracking-[0.15em]">Starting in</span>
+                  <span className="text-[10px] text-white/60 uppercase tracking-wider">Starting in</span>
                   <span className="text-lg font-bold font-mono text-white w-6 text-center">{countdown}</span>
                 </div>
               )}
@@ -293,14 +293,14 @@ export default function CineJamLobby({ onClose, onAddMovieToLibrary }) {
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {[...selectedMoods, ...selectedGenres].map(tag => (
-                    <span key={tag} className="text-[8px] font-mono uppercase tracking-[0.1em] text-on-surface-variant bg-surface-container-low border border-surface-container-high px-2 py-0.5">
+                    <span key={tag} className="text-[8px] font-mono uppercase tracking-widest text-on-surface-variant bg-surface-container-low border border-surface-container-high px-2 py-0.5">
                       {tag}
                     </span>
                   ))}
                 </div>
 
                 <div className="p-3 bg-surface-container-low border border-surface-container-high">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/60 mb-2">Overview</p>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-white/60 mb-2">Overview</p>
                   <p className="text-[9px] text-white/60">{matchedMovie.overview}</p>
                 </div>
               </div>
