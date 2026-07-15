@@ -35,7 +35,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="rounded-3xl border border-gray-800/80 bg-pitch-card p-8 text-center">
-        <p className="text-xs text-white/40 uppercase tracking-[0.2em]">Loading profile...</p>
+        <p className="text-xs text-on-surface-variant uppercase tracking-[0.2em]">Loading profile...</p>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="rounded-3xl border border-gray-800/80 bg-pitch-card p-8 text-center">
-        <p className="text-xs text-white/40 uppercase tracking-[0.2em]">Profile not found</p>
+        <p className="text-xs text-on-surface-variant uppercase tracking-[0.2em]">Profile not found</p>
       </div>
     );
   }
@@ -59,12 +59,12 @@ export default function Profile() {
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.35em] text-popcorn-gold">PopcornClash Member</div>
               <h2 className="mt-1 text-2xl font-black text-white">{profile.username}</h2>
-              <div className="mt-1 text-sm text-gray-400">Favorite Club: {profile.favorite_club || 'Not set'}</div>
+              <div className="mt-1 text-sm text-on-surface-variant">Favorite Club: {profile.favorite_club || 'Not set'}</div>
             </div>
           </div>
 
           <div className="rounded-2xl border border-gray-800/80 bg-pitch-over/70 px-4 py-3 text-center">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-500">Profile Level</div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-on-surface-variant">Profile Level</div>
             <div className="mt-1 text-3xl font-black text-white">{profile.current_level}</div>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function Profile() {
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <div className="font-semibold text-white">{pred.home_name} vs {pred.away_name}</div>
-                    <div className="mt-1 text-sm text-gray-400">Prediction: {pred.predicted_winner_id === pred.team_home_id ? 'Home' : pred.predicted_winner_id === pred.team_away_id ? 'Away' : 'Draw'}</div>
+                    <div className="mt-1 text-sm text-on-surface-variant">Prediction: {pred.predicted_winner_id === pred.team_home_id ? 'Home' : pred.predicted_winner_id === pred.team_away_id ? 'Away' : 'Draw'}</div>
                   </div>
                   <div className="rounded-2xl border border-popcorn-gold/20 bg-popcorn-gold/10 px-4 py-2 text-right">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-popcorn-gold">Confidence</div>
@@ -90,7 +90,7 @@ export default function Profile() {
             ))
           ) : (
             <div className="rounded-2xl border border-gray-800/80 bg-pitch-over/70 p-4 text-center">
-              <p className="text-xs text-gray-500">No predictions yet. Start predicting!</p>
+              <p className="text-xs text-on-surface-variant">No predictions yet. Start predicting!</p>
             </div>
           )}
         </div>

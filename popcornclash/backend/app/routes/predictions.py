@@ -13,8 +13,8 @@ def create_prediction_route():
     predicted_winner_id = data.get("predicted_winner_id")
     confidence = data.get("confidence", 50)
 
-    if not fixture_id or not predicted_winner_id:
-        return jsonify({"error": "fixture_id and predicted_winner_id are required"}), 400
+    if not fixture_id:
+        return jsonify({"error": "fixture_id is required"}), 400
 
     prediction_id = create_prediction(request.user_id, fixture_id, predicted_winner_id, confidence)
     return jsonify({"prediction_id": prediction_id, "confidence": confidence}), 201

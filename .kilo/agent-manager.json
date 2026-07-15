@@ -1,10 +1,35 @@
 {
-  "worktrees": {},
-  "sessions": {},
+  "worktrees": {
+    "wt-1783668695424-1": {
+      "branch": "wooden-ziconium",
+      "path": "/home/james-nzuki/Desktop/POPCLASH.DUMMY/.kilo/worktrees/wooden-ziconium",
+      "parentBranch": "main",
+      "createdAt": "2026-07-10T07:31:35.424Z",
+      "remote": "origin",
+      "branchOwned": true
+    }
+  },
+  "sessions": {
+    "ses_0b4e30bb1ffef92jfjrF7kz4k4": {
+      "worktreeId": "wt-1783668695424-1",
+      "createdAt": "2026-07-10T08:20:17.804Z"
+    },
+    "ses_0a0b2956effeZcjIpe3woNwUip": {
+      "worktreeId": "wt-1783668695424-1",
+      "createdAt": "2026-07-14T06:25:36.955Z"
+    }
+  },
   "tabOrder": {
     "local": [
-      "ses_0c9c7132cffe5iuU6no5c6zSrh"
+      "pending:1"
+    ],
+    "wt-1783668695424-1": [
+      "ses_0b4e30bb1ffef92jfjrF7kz4k4",
+      "ses_0a0b2956effeZcjIpe3woNwUip"
     ]
   },
+  "worktreeOrder": [
+    "wt-1783668695424-1"
+  ],
   "sessionsCollapsed": false
 }

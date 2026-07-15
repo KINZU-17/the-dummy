@@ -15,7 +15,6 @@ import Analytics from './Analytics';
 import Profile from './Profile';
 import MatchArena from './MatchArena';
 import CreateFixture from './CreateFixture';
-import { INITIAL_MOVIES, INITIAL_COLLECTIONS, INITIAL_WATCHING_HISTORY } from '../data';
 
 export default function CineMatch() {
   const navigate = useNavigate();
@@ -25,13 +24,19 @@ export default function CineMatch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCineJam, setShowCineJam] = useState(false);
   const [activePlayingMovie, setActivePlayingMovie] = useState(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState(null);
 
   const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem('popcornclash_tab');
     return saved || 'discover';
   });
+
+  useEffect(() => {
+    if (typeof location.state?.activeTab === 'string') {
+      // Sync active tab from router state on navigation; safe because this only fires when location.key changes
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.key, location.state?.activeTab]);
 
   const getActivePage = () => {
     if (location.pathname.startsWith('/match/')) return 'match';
@@ -51,15 +56,15 @@ export default function CineMatch() {
 
   const [movies, setMovies] = useState(() => {
     const saved = localStorage.getItem('popcornclash_movies');
-    return saved ? JSON.parse(saved) : INITIAL_MOVIES;
+    return saved ? JSON.parse(saved) : [];
   });
   const [collections, setCollections] = useState(() => {
     const saved = localStorage.getItem('popcornclash_collections');
-    return saved ? JSON.parse(saved) : INITIAL_COLLECTIONS;
+    return saved ? JSON.parse(saved) : [];
   });
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('popcornclash_history');
-    return saved ? JSON.parse(saved) : INITIAL_WATCHING_HISTORY;
+    return saved ? JSON.parse(saved) : [];
   });
 
   useEffect(() => { localStorage.setItem('popcornclash_movies', JSON.stringify(movies)); }, [movies]);
@@ -151,7 +156,12 @@ export default function CineMatch() {
     <div className="min-h-screen bg-background text-on-surface">
       <Sidebar
         activeTab={activeTab}
-        setActiveTab={(tab) => navigate('/movies', { state: { activeTab: tab } })}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          if (location.pathname !== '/movies') {
+            navigate('/movies');
+          }
+        }}
         activePage={activePage}
         setActivePage={(page) => {
           if (page === 'movies') navigate('/movies');
@@ -165,6 +175,7 @@ export default function CineMatch() {
         username={user?.username || 'Cinephile'}
         streakDays={user?.streak_count || 14}
         userRole={user?.role}
+        userLevel={user?.level || 'Level 1 Cinephile'}
       />
 
       <div className="md:ml-[260px] flex flex-col min-h-screen transition-all duration-300">
@@ -174,11 +185,6 @@ export default function CineMatch() {
           activeTab={activeTab}
           onSearchFocus={onSearchFocus}
           onMenuClick={() => setSidebarOpen(true)}
-          username={user?.username || 'Cinephile'}
-          userLevel={user?.level || 'Level 1 Cinephile'}
-          syncing={syncing}
-          syncError={syncError}
-          onSync={() => { setSyncError(null); setSyncing(false); }}
         />
 
         <main className="flex-1 pt-28 px-4 md:px-10 pb-20 max-w-[1440px] w-full mx-auto">

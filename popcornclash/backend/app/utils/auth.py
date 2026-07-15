@@ -1,5 +1,15 @@
 from functools import wraps
 from flask import request, jsonify
+import secrets
+
+
+_active_tokens = {}
+
+
+def create_token(user_id: int) -> str:
+    token = secrets.token_urlsafe(32)
+    _active_tokens[token] = user_id
+    return token
 
 
 def _current_user_id() -> int | None:
@@ -7,12 +17,7 @@ def _current_user_id() -> int | None:
     if not auth_header.startswith("Bearer "):
         return None
     token = auth_header.split(" ", 1)[1]
-    if not token.startswith("mock-token-"):
-        return None
-    try:
-        return int(token.split("-")[-1])
-    except ValueError:
-        return None
+    return _active_tokens.get(token)
 
 
 def login_required(fn):

@@ -1,8 +1,9 @@
 import hashlib
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from app.database.queries import get_user_by_email, create_user, get_user_by_id, update_user_profile
+from app.database.queries import get_user_by_email, get_user_by_username, create_user, get_user_by_id, update_user_profile
 from app.database.connection import get_cursor
+from app.utils.auth import create_token
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -28,33 +29,7 @@ def register():
     password_hash = _hash_password(password)
     user_id = create_user(username, email, password_hash, favorite_club)
     user = get_user_by_id(user_id)
-    return jsonify({
-        "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
-            "favorite_club": user["favorite_club"],
-            "current_level": user["current_level"],
-            "total_xp": user["total_xp"],
-            "prediction_streak": user["prediction_streak"],
-            "role": user["role"],
-        }
-    }), 201
-
-
-@auth_bp.route("/login", methods=["POST"])
-def login():
-    data = request.get_json(silent=True) or {}
-    email = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
-
-    if not email or not password:
-        return jsonify({"error": "email and password are required"}), 400
-
-    user = get_user_by_email(email)
-    if not user or user["password_hash"] != _hash_password(password):
-        return jsonify({"error": "Invalid email or password"}), 401
-
+    token = create_token(user_id)
     return jsonify({
         "user": {
             "id": user["id"],
@@ -66,5 +41,34 @@ def login():
             "prediction_streak": user["prediction_streak"],
             "role": user["role"],
         },
-        "token": f"mock-token-{user['id']}",
+        "token": token,
+    }), 201
+
+
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json(silent=True) or {}
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        return jsonify({"error": "username and password are required"}), 400
+
+    user = get_user_by_username(username)
+    if not user or user["password_hash"] != _hash_password(password):
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    token = create_token(user["id"])
+    return jsonify({
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+            "favorite_club": user["favorite_club"],
+            "current_level": user["current_level"],
+            "total_xp": user["total_xp"],
+            "prediction_streak": user["prediction_streak"],
+            "role": user["role"],
+        },
+        "token": token,
     })

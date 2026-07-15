@@ -4,7 +4,7 @@ import { useGame } from '../context/GameStateContext';
 import { api } from '../utils/backendApi';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const data = await api.auth.login({ email, password });
+      const data = await api.auth.login({ username, password });
       localStorage.setItem('token', data.token);
       setUser({
         isAuthenticated: true,
@@ -37,29 +37,29 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 bg-pitch-card border border-gray-800 p-8 rounded-2xl shadow-gold-glow">
+    <div className="max-w-md mx-auto mt-12 bg-surface-container border border-surface-container-high p-8 rounded-2xl shadow-card-glow">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-black text-white uppercase tracking-wider mt-2">Sign In</h2>
       </div>
       {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs">{error}</div>}
       <form onSubmit={handleLoginSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address</label>
-          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-pitch-over border border-gray-800 focus:border-popcorn-gold outline-none p-3 rounded-lg text-sm text-white transition-all" />
+          <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Username</label>
+          <input type="text" required value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-surface-container-low border border-surface-container-high focus:border-warm-gold outline-none p-3 rounded-lg text-sm text-white transition-all" />
         </div>
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
-          <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-pitch-over border border-gray-800 focus:border-popcorn-gold outline-none p-3 rounded-lg text-sm text-white transition-all" />
+          <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Password</label>
+          <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-surface-container-low border border-surface-container-high focus:border-warm-gold outline-none p-3 rounded-lg text-sm text-white transition-all" />
         </div>
         <div className="text-right">
-          <Link to="/forgot-password" className="text-xs text-popcorn-gold hover:underline">Forgot Password?</Link>
+          <Link to="/forgot-password" className="text-xs text-warm-gold hover:underline">Forgot Password?</Link>
         </div>
-        <button type="submit" disabled={loading} className="w-full py-3 bg-linear-to-r from-popcorn-gold to-popcorn-glow text-pitch-dark font-black rounded-lg text-sm uppercase tracking-wider shadow-md hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-50">
+        <button type="submit" disabled={loading} className="w-full py-3 bg-gradient-to-r from-warm-gold to-warm-gold-light text-on-primary-container font-black rounded-lg text-sm uppercase tracking-wider shadow-md hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-50">
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
-      <p className="text-center text-xs text-gray-400 mt-6">
-        New here? <Link to="/signup" className="text-popcorn-gold font-bold hover:underline">Create Account</Link>
+      <p className="text-center text-xs text-on-surface-variant mt-6">
+        New here? <Link to="/signup" className="text-warm-gold font-bold hover:underline">Create Account</Link>
       </p>
     </div>
   );

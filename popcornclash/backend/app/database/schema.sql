@@ -33,11 +33,24 @@ CREATE TABLE IF NOT EXISTS vote_predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     fixture_id INTEGER NOT NULL,
-    predicted_winner_id INTEGER NOT NULL,
+    predicted_winner_id INTEGER,
     confidence_score INTEGER DEFAULT 50,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (fixture_id) REFERENCES fixtures(id),
     FOREIGN KEY (predicted_winner_id) REFERENCES teams(id),
     UNIQUE(user_id, fixture_id)
+);
+
+CREATE TABLE IF NOT EXISTS movies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tmdb_id INTEGER UNIQUE,
+    title TEXT NOT NULL,
+    overview TEXT,
+    poster_url TEXT,
+    genre TEXT,
+    year INTEGER,
+    rating REAL,
+    duration TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

@@ -10,6 +10,13 @@ def get_user_by_email(email: str) -> Optional[dict]:
         return dict(row) if row else None
 
 
+def get_user_by_username(username: str) -> Optional[dict]:
+    with get_cursor() as cur:
+        cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+        row = cur.fetchone()
+        return dict(row) if row else None
+
+
 def create_user(username: str, email: str, password_hash: str, favorite_club: str = "") -> int:
     with get_cursor() as cur:
         cur.execute(
@@ -100,7 +107,7 @@ def update_fixture_status(fixture_id: int, status: str) -> None:
         cur.execute("UPDATE fixtures SET status = ? WHERE id = ?", (status, fixture_id))
 
 
-def create_prediction(user_id: int, fixture_id: int, predicted_winner_id: int, confidence: int) -> int:
+def create_prediction(user_id: int, fixture_id: int, predicted_winner_id: int | None, confidence: int) -> int:
     with get_cursor() as cur:
         cur.execute(
             """INSERT INTO vote_predictions (user_id, fixture_id, predicted_winner_id, confidence_score)
@@ -153,3 +160,34 @@ def get_leaderboard(limit: int = 50) -> list[dict]:
             LIMIT ?
         """, (limit,))
         return [dict(row) for row in cur.fetchall()]
+
+
+def create_movie(tmdb_id, title, overview, poster_url, genre, year, rating, duration) -> int:
+    with get_cursor() as cur:
+        cur.execute(
+            """INSERT INTO movies (tmdb_id, title, overview, poster_url, genre, year, rating, duration)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+               ON CONFLICT(tmdb_id) DO UPDATE SET
+               title = excluded.title,
+               overview = excluded.overview,
+               poster_url = excluded.poster_url,
+               genre = excluded.genre,
+               year = excluded.year,
+               rating = excluded.rating,
+               duration = excluded.duration""",
+            (tmdb_id, title, overview, poster_url, genre, year, rating, duration),
+        )
+        return cur.lastrowid
+
+
+def get_all_movies(limit: int = 50) -> list[dict]:
+    with get_cursor() as cur:
+        cur.execute("SELECT * FROM movies ORDER BY year DESC, rating DESC LIMIT ?", (limit,))
+        return [dict(row) for row in cur.fetchall()]
+
+
+def get_movie_by_id(movie_id: int) -> dict | None:
+    with get_cursor() as cur:
+        cur.execute("SELECT * FROM movies WHERE id = ?", (movie_id,))
+        row = cur.fetchone()
+        return dict(row) if row else None

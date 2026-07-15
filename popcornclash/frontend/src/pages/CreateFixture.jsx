@@ -52,7 +52,7 @@ export default function CreateFixture() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Home Team</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-on-surface-variant">Home Team</label>
           <select required value={form.team_home_id} onChange={(event) => setForm({ ...form, team_home_id: event.target.value })} className="w-full rounded-2xl border border-gray-800/80 bg-pitch-over/70 px-3 py-3 text-sm text-white outline-none transition focus:border-popcorn-gold">
             <option value="">Select home team</option>
             {teams.map((team) => (
@@ -61,7 +61,7 @@ export default function CreateFixture() {
           </select>
         </div>
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Away Team</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-on-surface-variant">Away Team</label>
           <select required value={form.team_away_id} onChange={(event) => setForm({ ...form, team_away_id: event.target.value })} className="w-full rounded-2xl border border-gray-800/80 bg-pitch-over/70 px-3 py-3 text-sm text-white outline-none transition focus:border-popcorn-gold">
             <option value="">Select away team</option>
             {teams.map((team) => (
@@ -70,11 +70,11 @@ export default function CreateFixture() {
           </select>
         </div>
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Match Date & Time</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-on-surface-variant">Match Date & Time</label>
           <input type="datetime-local" required value={form.match_date} onChange={(event) => setForm({ ...form, match_date: event.target.value })} className="w-full rounded-2xl border border-gray-800/80 bg-pitch-over/70 px-3 py-3 text-sm text-white outline-none transition focus:border-popcorn-gold" />
         </div>
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">Status</label>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.25em] text-on-surface-variant">Status</label>
           <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="w-full rounded-2xl border border-gray-800/80 bg-pitch-over/70 px-3 py-3 text-sm text-white outline-none transition focus:border-popcorn-gold">
             <option value="SCHEDULED">Scheduled</option>
             <option value="LIVE">Live</option>
